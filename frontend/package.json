@@ -1,0 +1,8 @@
+{
+  "name": "wave1-frontend",
+  "private": true,
+  "scripts": {
+    "lint": "echo lint placeholder",
+    "test": "echo test placeholder"
+  }
+}
