@@ -12,7 +12,5 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/bdd/iam/iam_admin_access_w12.feature")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
-@ConfigurationParameter(
-        key = GLUE_PROPERTY_NAME,
-        value = "com.platform.bdd.iam.api")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.platform.bdd.iam.api")
 public class IamAdminAccessW12BddSuite {}

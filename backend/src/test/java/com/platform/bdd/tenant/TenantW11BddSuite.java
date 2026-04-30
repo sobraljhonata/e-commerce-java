@@ -8,9 +8,7 @@ import org.junit.platform.suite.api.IncludeEngines;
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
 
-/**
- * Suite JUnit Platform que executa os cenários Cucumber do BC Tenant (W1.1).
- */
+/** Suite JUnit Platform que executa os cenários Cucumber do BC Tenant (W1.1). */
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/bdd/tenant_admin_w11.feature")

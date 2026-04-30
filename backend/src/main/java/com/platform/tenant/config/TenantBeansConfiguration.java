@@ -12,28 +12,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TenantBeansConfiguration {
 
-    @Bean
-    TenantRepository tenantRepository() {
-        return new InMemoryTenantRepository();
-    }
+  @Bean
+  TenantRepository tenantRepository() {
+    return new InMemoryTenantRepository();
+  }
 
-    @Bean
-    CreateTenantUseCase createTenantUseCase(TenantRepository tenants) {
-        return new CreateTenantUseCase(tenants);
-    }
+  @Bean
+  CreateTenantUseCase createTenantUseCase(TenantRepository tenants) {
+    return new CreateTenantUseCase(tenants);
+  }
 
-    @Bean
-    GetTenantByIdUseCase getTenantByIdUseCase(TenantRepository tenants) {
-        return new GetTenantByIdUseCase(tenants);
-    }
+  @Bean
+  GetTenantByIdUseCase getTenantByIdUseCase(TenantRepository tenants) {
+    return new GetTenantByIdUseCase(tenants);
+  }
 
-    @Bean
-    GetTenantBySlugUseCase getTenantBySlugUseCase(TenantRepository tenants) {
-        return new GetTenantBySlugUseCase(tenants);
-    }
+  @Bean
+  GetTenantBySlugUseCase getTenantBySlugUseCase(TenantRepository tenants) {
+    return new GetTenantBySlugUseCase(tenants);
+  }
 
-    @Bean
-    UpdateTenantStatusUseCase updateTenantStatusUseCase(TenantRepository tenants) {
-        return new UpdateTenantStatusUseCase(tenants);
-    }
+  @Bean
+  UpdateTenantStatusUseCase updateTenantStatusUseCase(TenantRepository tenants) {
+    return new UpdateTenantStatusUseCase(tenants);
+  }
 }

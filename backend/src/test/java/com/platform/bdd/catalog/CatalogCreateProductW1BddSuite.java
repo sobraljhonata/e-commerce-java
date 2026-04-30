@@ -12,7 +12,5 @@ import org.junit.platform.suite.api.Suite;
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features/bdd/catalog/catalog_create_product_w1.feature")
 @ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
-@ConfigurationParameter(
-        key = GLUE_PROPERTY_NAME,
-        value = "com.platform.bdd.catalog")
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.platform.bdd.catalog")
 public class CatalogCreateProductW1BddSuite {}

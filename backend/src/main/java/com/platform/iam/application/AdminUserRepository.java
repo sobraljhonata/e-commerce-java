@@ -5,7 +5,7 @@ import java.util.Optional;
 
 public interface AdminUserRepository {
 
-    Optional<AdminUser> findByEmail(String canonicalEmail);
+  Optional<AdminUser> findByEmail(String canonicalEmail);
 
-    void save(AdminUser user);
+  void save(AdminUser user);
 }

@@ -14,26 +14,26 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(prefix = "platform.security.jwt")
 public class JwtSecurityProperties {
 
-    /** HS256: mínimo 256 bits (32 caracteres UTF-8). */
-    @NotBlank
-    @Size(min = 32)
-    private String secret;
+  /** HS256: mínimo 256 bits (32 caracteres UTF-8). */
+  @NotBlank
+  @Size(min = 32)
+  private String secret;
 
-    @Positive private long expiresInSeconds = 3600L;
+  @Positive private long expiresInSeconds = 3600L;
 
-    public String getSecret() {
-        return secret;
-    }
+  public String getSecret() {
+    return secret;
+  }
 
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
+  public void setSecret(String secret) {
+    this.secret = secret;
+  }
 
-    public long getExpiresInSeconds() {
-        return expiresInSeconds;
-    }
+  public long getExpiresInSeconds() {
+    return expiresInSeconds;
+  }
 
-    public void setExpiresInSeconds(long expiresInSeconds) {
-        this.expiresInSeconds = expiresInSeconds;
-    }
+  public void setExpiresInSeconds(long expiresInSeconds) {
+    this.expiresInSeconds = expiresInSeconds;
+  }
 }

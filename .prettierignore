@@ -1,0 +1,15 @@
+backend/target/
+frontend/node_modules/
+.m2/
+.git/
+.idea/
+.vscode/
+*.class
+*.jar
+*.war
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.pdf

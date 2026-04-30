@@ -31,188 +31,186 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
-/**
- * BDD W1.1: API admin de tenants com stack real (use cases + repositório em memória + MockMvc).
- */
+/** BDD W1.1: API admin de tenants com stack real (use cases + repositório em memória + MockMvc). */
 public class TenantAdminStepDefinitions {
 
-    private InMemoryTenantRepository repository;
-    private MockMvc mockMvc;
-    private final ObjectMapper mapper = new ObjectMapper();
+  private InMemoryTenantRepository repository;
+  private MockMvc mockMvc;
+  private final ObjectMapper mapper = new ObjectMapper();
 
-    private int lastStatus;
-    private JsonNode lastJson;
-    private String lastTenantId;
-    private UUID lastRandomId;
+  private int lastStatus;
+  private JsonNode lastJson;
+  private String lastTenantId;
+  private UUID lastRandomId;
 
-    @Before
-    public void reset() {
-        repository = new InMemoryTenantRepository();
-        var validator = new LocalValidatorFactoryBean();
-        validator.afterPropertiesSet();
-        var controller =
-            new TenantController(
-                new CreateTenantUseCase(repository),
-                new GetTenantByIdUseCase(repository),
-                new GetTenantBySlugUseCase(repository),
-                new UpdateTenantStatusUseCase(repository));
-        mockMvc =
-            MockMvcBuilders.standaloneSetup(controller)
-                .setControllerAdvice(new TenantExceptionHandler())
-                .setValidator(validator)
-                .build();
-        lastStatus = 0;
-        lastJson = null;
-        lastTenantId = null;
-        lastRandomId = null;
+  @Before
+  public void reset() {
+    repository = new InMemoryTenantRepository();
+    var validator = new LocalValidatorFactoryBean();
+    validator.afterPropertiesSet();
+    var controller =
+        new TenantController(
+            new CreateTenantUseCase(repository),
+            new GetTenantByIdUseCase(repository),
+            new GetTenantBySlugUseCase(repository),
+            new UpdateTenantStatusUseCase(repository));
+    mockMvc =
+        MockMvcBuilders.standaloneSetup(controller)
+            .setControllerAdvice(new TenantExceptionHandler())
+            .setValidator(validator)
+            .build();
+    lastStatus = 0;
+    lastJson = null;
+    lastTenantId = null;
+    lastRandomId = null;
+  }
+
+  @Dado("que o catálogo de tenants está vazio")
+  public void catalogoVazio() {
+    // estado inicial garantido em @Before
+  }
+
+  @Dado("que já existe um tenant com slug {string} e nome {string}")
+  public void tenantExistente(String slug, String nome) {
+    repository.save(Tenant.create(slug, nome));
+  }
+
+  @Dado("que existe um tenant com slug {string} e nome {string}")
+  public void tenantCriadoViaApi(String slug, String nome) throws Exception {
+    postCreateTenant(slug, nome);
+    assertEquals(201, lastStatus, () -> "esperado 201 ao preparar tenant, obtido " + lastStatus);
+    lastTenantId = lastJson.get("id").asText();
+  }
+
+  @Dado("que existe um tenant ativo com slug {string} e nome {string}")
+  public void tenantAtivo(String slug, String nome) throws Exception {
+    tenantCriadoViaApi(slug, nome);
+  }
+
+  @Dado("que existe um tenant inativo com slug {string} e nome {string}")
+  public void tenantInativo(String slug, String nome) throws Exception {
+    tenantCriadoViaApi(slug, nome);
+    patchStatus(false);
+    assertEquals(200, lastStatus);
+    assertFalse(lastJson.get("active").asBoolean());
+  }
+
+  @Quando("o operador cria um tenant com slug {string} e nome de exibição {string}")
+  public void quandoOperadorCriaTenant(String slug, String nomeExibicao) throws Exception {
+    postCreateTenant(slug, nomeExibicao);
+    if (lastStatus == 201 && lastJson != null && lastJson.has("id")) {
+      lastTenantId = lastJson.get("id").asText();
     }
+  }
 
-    @Dado("que o catálogo de tenants está vazio")
-    public void catalogoVazio() {
-        // estado inicial garantido em @Before
-    }
+  private void postCreateTenant(String slug, String nomeExibicao) throws Exception {
+    ResultActions actions =
+        mockMvc.perform(
+            post("/api/admin/tenants")
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(new CreateTenantRequest(slug, nomeExibicao))));
+    capture(actions);
+  }
 
-    @Dado("que já existe um tenant com slug {string} e nome {string}")
-    public void tenantExistente(String slug, String nome) {
-        repository.save(Tenant.create(slug, nome));
-    }
+  @Quando("o operador tenta criar outro tenant com slug {string} e nome {string}")
+  public void tentarDuplicar(String slug, String nome) throws Exception {
+    postCreateTenant(slug, nome);
+  }
 
-    @Dado("que existe um tenant com slug {string} e nome {string}")
-    public void tenantCriadoViaApi(String slug, String nome) throws Exception {
-        postCreateTenant(slug, nome);
-        assertEquals(201, lastStatus, () -> "esperado 201 ao preparar tenant, obtido " + lastStatus);
-        lastTenantId = lastJson.get("id").asText();
-    }
+  @Quando("o operador consulta o tenant pelo id retornado na criação")
+  public void consultarPorId() throws Exception {
+    ResultActions actions =
+        mockMvc.perform(get("/api/admin/tenants/{id}", UUID.fromString(lastTenantId)));
+    capture(actions);
+  }
 
-    @Dado("que existe um tenant ativo com slug {string} e nome {string}")
-    public void tenantAtivo(String slug, String nome) throws Exception {
-        tenantCriadoViaApi(slug, nome);
-    }
+  @Quando("o operador consulta o tenant pelo slug {string}")
+  public void consultarPorSlug(String slug) throws Exception {
+    ResultActions actions = mockMvc.perform(get("/api/admin/tenants/slug/{slug}", slug));
+    capture(actions);
+  }
 
-    @Dado("que existe um tenant inativo com slug {string} e nome {string}")
-    public void tenantInativo(String slug, String nome) throws Exception {
-        tenantCriadoViaApi(slug, nome);
-        patchStatus(false);
-        assertEquals(200, lastStatus);
-        assertFalse(lastJson.get("active").asBoolean());
-    }
+  @Quando("o operador consulta um tenant por um id aleatório")
+  public void consultarIdAleatorio() throws Exception {
+    lastRandomId = UUID.randomUUID();
+    ResultActions actions = mockMvc.perform(get("/api/admin/tenants/{id}", lastRandomId));
+    capture(actions);
+  }
 
-    @Quando("o operador cria um tenant com slug {string} e nome de exibição {string}")
-    public void quandoOperadorCriaTenant(String slug, String nomeExibicao) throws Exception {
-        postCreateTenant(slug, nomeExibicao);
-        if (lastStatus == 201 && lastJson != null && lastJson.has("id")) {
-            lastTenantId = lastJson.get("id").asText();
-        }
-    }
+  @Quando("o operador define o status do tenant como inativo")
+  public void desativar() throws Exception {
+    patchStatus(false);
+  }
 
-    private void postCreateTenant(String slug, String nomeExibicao) throws Exception {
-        ResultActions actions =
-            mockMvc.perform(
-                post("/api/admin/tenants")
-                    .contentType(APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(new CreateTenantRequest(slug, nomeExibicao))));
-        capture(actions);
-    }
+  @Quando("o operador define o status do tenant como ativo")
+  public void ativar() throws Exception {
+    patchStatus(true);
+  }
 
-    @Quando("o operador tenta criar outro tenant com slug {string} e nome {string}")
-    public void tentarDuplicar(String slug, String nome) throws Exception {
-        postCreateTenant(slug, nome);
-    }
+  private void patchStatus(boolean active) throws Exception {
+    ResultActions actions =
+        mockMvc.perform(
+            patch("/api/admin/tenants/{id}/status", UUID.fromString(lastTenantId))
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(new UpdateTenantStatusRequest(active))));
+    capture(actions);
+  }
 
-    @Quando("o operador consulta o tenant pelo id retornado na criação")
-    public void consultarPorId() throws Exception {
-        ResultActions actions =
-            mockMvc.perform(get("/api/admin/tenants/{id}", UUID.fromString(lastTenantId)));
-        capture(actions);
+  private void capture(ResultActions actions) throws Exception {
+    var result = actions.andReturn();
+    lastStatus = result.getResponse().getStatus();
+    String raw = result.getResponse().getContentAsString();
+    if (raw == null || raw.isBlank()) {
+      lastJson = null;
+    } else {
+      lastJson = mapper.readTree(raw);
     }
+  }
 
-    @Quando("o operador consulta o tenant pelo slug {string}")
-    public void consultarPorSlug(String slug) throws Exception {
-        ResultActions actions = mockMvc.perform(get("/api/admin/tenants/slug/{slug}", slug));
-        capture(actions);
-    }
+  @Então("a API responde {int}")
+  public void statusEsperado(int esperado) {
+    assertEquals(esperado, lastStatus);
+  }
 
-    @Quando("o operador consulta um tenant por um id aleatório")
-    public void consultarIdAleatorio() throws Exception {
-        lastRandomId = UUID.randomUUID();
-        ResultActions actions = mockMvc.perform(get("/api/admin/tenants/{id}", lastRandomId));
-        capture(actions);
-    }
+  @Então("o corpo contém slug {string}")
+  public void corpoContemSlug(String slug) {
+    assertNotNull(lastJson);
+    assertEquals(slug, lastJson.get("slug").asText());
+  }
 
-    @Quando("o operador define o status do tenant como inativo")
-    public void desativar() throws Exception {
-        patchStatus(false);
-    }
+  @Então("o corpo indica que o tenant está ativo")
+  public void corpoAtivo() {
+    assertNotNull(lastJson);
+    assertTrue(lastJson.get("active").asBoolean());
+  }
 
-    @Quando("o operador define o status do tenant como ativo")
-    public void ativar() throws Exception {
-        patchStatus(true);
-    }
+  @Então("o corpo indica que o tenant está inativo")
+  public void corpoInativo() {
+    assertNotNull(lastJson);
+    assertFalse(lastJson.get("active").asBoolean());
+  }
 
-    private void patchStatus(boolean active) throws Exception {
-        ResultActions actions =
-            mockMvc.perform(
-                patch("/api/admin/tenants/{id}/status", UUID.fromString(lastTenantId))
-                    .contentType(APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(new UpdateTenantStatusRequest(active))));
-        capture(actions);
-    }
+  @Então("o corpo contém um id de tenant válido")
+  public void idValido() {
+    assertNotNull(lastJson);
+    assertNotNull(UUID.fromString(lastJson.get("id").asText()));
+  }
 
-    private void capture(ResultActions actions) throws Exception {
-        var result = actions.andReturn();
-        lastStatus = result.getResponse().getStatus();
-        String raw = result.getResponse().getContentAsString();
-        if (raw == null || raw.isBlank()) {
-            lastJson = null;
-        } else {
-            lastJson = mapper.readTree(raw);
-        }
-    }
+  @Então("o corpo de erro tem código {string}")
+  public void erroCodigo(String codigo) {
+    assertNotNull(lastJson);
+    assertEquals(codigo, lastJson.get("code").asText());
+  }
 
-    @Então("a API responde {int}")
-    public void statusEsperado(int esperado) {
-        assertEquals(esperado, lastStatus);
-    }
+  @Então("o corpo de erro referencia o slug {string}")
+  public void erroSlug(String slug) {
+    assertNotNull(lastJson);
+    assertEquals(slug, lastJson.get("slug").asText());
+  }
 
-    @Então("o corpo contém slug {string}")
-    public void corpoContemSlug(String slug) {
-        assertNotNull(lastJson);
-        assertEquals(slug, lastJson.get("slug").asText());
-    }
-
-    @Então("o corpo indica que o tenant está ativo")
-    public void corpoAtivo() {
-        assertNotNull(lastJson);
-        assertTrue(lastJson.get("active").asBoolean());
-    }
-
-    @Então("o corpo indica que o tenant está inativo")
-    public void corpoInativo() {
-        assertNotNull(lastJson);
-        assertFalse(lastJson.get("active").asBoolean());
-    }
-
-    @Então("o corpo contém um id de tenant válido")
-    public void idValido() {
-        assertNotNull(lastJson);
-        assertNotNull(UUID.fromString(lastJson.get("id").asText()));
-    }
-
-    @Então("o corpo de erro tem código {string}")
-    public void erroCodigo(String codigo) {
-        assertNotNull(lastJson);
-        assertEquals(codigo, lastJson.get("code").asText());
-    }
-
-    @Então("o corpo de erro referencia o slug {string}")
-    public void erroSlug(String slug) {
-        assertNotNull(lastJson);
-        assertEquals(slug, lastJson.get("slug").asText());
-    }
-
-    @Então("o corpo de erro referencia o tenantId consultado")
-    public void erroTenantIdConsultado() {
-        assertNotNull(lastJson);
-        assertEquals(lastRandomId.toString(), lastJson.get("tenantId").asText());
-    }
+  @Então("o corpo de erro referencia o tenantId consultado")
+  public void erroTenantIdConsultado() {
+    assertNotNull(lastJson);
+    assertEquals(lastRandomId.toString(), lastJson.get("tenantId").asText());
+  }
 }

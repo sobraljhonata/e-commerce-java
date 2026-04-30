@@ -6,7 +6,7 @@ package com.platform.catalog.application;
  */
 public final class AuthenticatedContextRequiredException extends RuntimeException {
 
-    public AuthenticatedContextRequiredException() {
-        super("Authenticated user context with tenant is required");
-    }
+  public AuthenticatedContextRequiredException() {
+    super("Authenticated user context with tenant is required");
+  }
 }

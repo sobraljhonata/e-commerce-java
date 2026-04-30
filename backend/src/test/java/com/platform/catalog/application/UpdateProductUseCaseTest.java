@@ -6,79 +6,74 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import com.platform.catalog.domain.Product;
+import com.platform.catalog.domain.ProductNotFoundException;
+import com.platform.iam.application.AuthenticatedUser;
+import com.platform.iam.application.CurrentUserProvider;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.platform.catalog.domain.Product;
-import com.platform.catalog.domain.ProductNotFoundException;
-import com.platform.iam.application.AuthenticatedUser;
-import com.platform.iam.application.CurrentUserProvider;
-
 @ExtendWith(MockitoExtension.class)
 class UpdateProductUseCaseTest {
 
-    private static final UUID TENANT = UUID.fromString("11111111-2222-3333-4444-555555555555");
-    private static final UUID USER = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
+  private static final UUID TENANT = UUID.fromString("11111111-2222-3333-4444-555555555555");
+  private static final UUID USER = UUID.fromString("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
 
-    @Mock
-    private ProductRepository productRepository;
+  @Mock private ProductRepository productRepository;
 
-    @Mock
-    private CurrentUserProvider currentUserProvider;
+  @Mock private CurrentUserProvider currentUserProvider;
 
-    @InjectMocks
-    private UpdateProductUseCase useCase;
+  @InjectMocks private UpdateProductUseCase useCase;
 
-    @Test
-    void updates_and_persists_when_same_tenant() {
-        UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-        Product existing = Product.restore(productId, TENANT, "Old", BigDecimal.ONE, true);
-        when(currentUserProvider.currentUser())
-                .thenReturn(
-                        Optional.of(
-                                new AuthenticatedUser(
-                                        USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
-        when(productRepository.findByIdAndTenant(TENANT, productId)).thenReturn(Optional.of(existing));
+  @Test
+  void updates_and_persists_when_same_tenant() {
+    UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    Product existing = Product.restore(productId, TENANT, "Old", BigDecimal.ONE, true);
+    when(currentUserProvider.currentUser())
+        .thenReturn(
+            Optional.of(
+                new AuthenticatedUser(USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
+    when(productRepository.findByIdAndTenant(TENANT, productId)).thenReturn(Optional.of(existing));
 
-        Product result = useCase.execute(productId, "New", new BigDecimal("9.99"), false);
+    Product result = useCase.execute(productId, "New", new BigDecimal("9.99"), false);
 
-        assertEquals(productId, result.id());
-        assertEquals(TENANT, result.tenantId());
-        assertEquals("New", result.name());
-        assertEquals(0, new BigDecimal("9.99").compareTo(result.price()));
-        assertEquals(false, result.active());
+    assertEquals(productId, result.id());
+    assertEquals(TENANT, result.tenantId());
+    assertEquals("New", result.name());
+    assertEquals(0, new BigDecimal("9.99").compareTo(result.price()));
+    assertEquals(false, result.active());
 
-        verify(productRepository).save(result);
-    }
+    verify(productRepository).save(result);
+  }
 
-    @Test
-    void throws_not_found_when_repository_empty() {
-        UUID productId = UUID.randomUUID();
-        when(currentUserProvider.currentUser())
-                .thenReturn(
-                        Optional.of(
-                                new AuthenticatedUser(
-                                        USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
-        when(productRepository.findByIdAndTenant(TENANT, productId)).thenReturn(Optional.empty());
+  @Test
+  void throws_not_found_when_repository_empty() {
+    UUID productId = UUID.randomUUID();
+    when(currentUserProvider.currentUser())
+        .thenReturn(
+            Optional.of(
+                new AuthenticatedUser(USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
+    when(productRepository.findByIdAndTenant(TENANT, productId)).thenReturn(Optional.empty());
 
-        assertThrows(ProductNotFoundException.class, () -> useCase.execute(productId, "X", BigDecimal.ONE, true));
-    }
+    assertThrows(
+        ProductNotFoundException.class,
+        () -> useCase.execute(productId, "X", BigDecimal.ONE, true));
+  }
 
-    @Test
-    void fails_when_no_authenticated_context() {
-        when(currentUserProvider.currentUser()).thenReturn(Optional.empty());
+  @Test
+  void fails_when_no_authenticated_context() {
+    when(currentUserProvider.currentUser()).thenReturn(Optional.empty());
 
-        assertThrows(
-                AuthenticatedContextRequiredException.class,
-                () -> useCase.execute(UUID.randomUUID(), "X", BigDecimal.ONE, true));
-        verifyNoInteractions(productRepository);
-    }
+    assertThrows(
+        AuthenticatedContextRequiredException.class,
+        () -> useCase.execute(UUID.randomUUID(), "X", BigDecimal.ONE, true));
+    verifyNoInteractions(productRepository);
+  }
 }

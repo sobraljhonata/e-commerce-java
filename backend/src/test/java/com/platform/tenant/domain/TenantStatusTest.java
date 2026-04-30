@@ -9,41 +9,41 @@ import org.junit.jupiter.api.Test;
 
 class TenantStatusTest {
 
-    @Test
-    void activate_is_idempotent_when_already_active() {
-        var id = UUID.randomUUID();
-        var tenant = new Tenant(id, "a", "A", true);
+  @Test
+  void activate_is_idempotent_when_already_active() {
+    var id = UUID.randomUUID();
+    var tenant = new Tenant(id, "a", "A", true);
 
-        assertSame(tenant, tenant.activate());
-    }
+    assertSame(tenant, tenant.activate());
+  }
 
-    @Test
-    void deactivate_is_idempotent_when_already_inactive() {
-        var id = UUID.randomUUID();
-        var tenant = new Tenant(id, "a", "A", false);
+  @Test
+  void deactivate_is_idempotent_when_already_inactive() {
+    var id = UUID.randomUUID();
+    var tenant = new Tenant(id, "a", "A", false);
 
-        assertSame(tenant, tenant.deactivate());
-    }
+    assertSame(tenant, tenant.deactivate());
+  }
 
-    @Test
-    void activate_changes_inactive_to_active() {
-        var id = UUID.randomUUID();
-        var inactive = new Tenant(id, "a", "A", false);
+  @Test
+  void activate_changes_inactive_to_active() {
+    var id = UUID.randomUUID();
+    var inactive = new Tenant(id, "a", "A", false);
 
-        var next = inactive.activate();
+    var next = inactive.activate();
 
-        assertTrue(next.active());
-        assertSame(id, next.id());
-    }
+    assertTrue(next.active());
+    assertSame(id, next.id());
+  }
 
-    @Test
-    void deactivate_changes_active_to_inactive() {
-        var id = UUID.randomUUID();
-        var active = new Tenant(id, "a", "A", true);
+  @Test
+  void deactivate_changes_active_to_inactive() {
+    var id = UUID.randomUUID();
+    var active = new Tenant(id, "a", "A", true);
 
-        var next = active.deactivate();
+    var next = active.deactivate();
 
-        assertFalse(next.active());
-        assertSame(id, next.id());
-    }
+    assertFalse(next.active());
+    assertSame(id, next.id());
+  }
 }

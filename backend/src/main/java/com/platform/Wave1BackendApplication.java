@@ -8,16 +8,16 @@ import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfigurat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
- * Repositórios W1 ainda são em memória; JPA/PostgreSQL fica no classpath para evolução — excluído do
- * auto-config até haver persistência real.
+ * Repositórios W1 ainda são em memória; JPA/PostgreSQL fica no classpath para evolução — excluído
+ * do auto-config até haver persistência real.
  */
 @SpringBootApplication(
-        scanBasePackages = "com.platform",
-        exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+    scanBasePackages = "com.platform",
+    exclude = {DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 @EnableConfigurationProperties(JwtSecurityProperties.class)
 public class Wave1BackendApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(Wave1BackendApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(Wave1BackendApplication.class, args);
+  }
 }

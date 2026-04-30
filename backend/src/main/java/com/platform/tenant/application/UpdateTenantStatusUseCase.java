@@ -7,16 +7,19 @@ import java.util.UUID;
 
 public class UpdateTenantStatusUseCase {
 
-    private final TenantRepository tenantRepository;
+  private final TenantRepository tenantRepository;
 
-    public UpdateTenantStatusUseCase(TenantRepository tenantRepository) {
-        this.tenantRepository = tenantRepository;
-    }
+  public UpdateTenantStatusUseCase(TenantRepository tenantRepository) {
+    this.tenantRepository = tenantRepository;
+  }
 
-    public Tenant execute(UUID id, boolean active) {
-        UUID resolved = Objects.requireNonNull(id, "id");
-        Tenant current = tenantRepository.findById(resolved).orElseThrow(() -> new TenantNotFoundException(resolved));
-        Tenant next = active ? current.activate() : current.deactivate();
-        return tenantRepository.save(next);
-    }
+  public Tenant execute(UUID id, boolean active) {
+    UUID resolved = Objects.requireNonNull(id, "id");
+    Tenant current =
+        tenantRepository
+            .findById(resolved)
+            .orElseThrow(() -> new TenantNotFoundException(resolved));
+    Tenant next = active ? current.activate() : current.deactivate();
+    return tenantRepository.save(next);
+  }
 }
