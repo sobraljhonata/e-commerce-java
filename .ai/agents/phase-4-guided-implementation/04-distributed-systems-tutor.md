@@ -44,3 +44,8 @@ Se qualquer item do checklist tiver status = Missing:
 - destacar explicitamente no output;
 - sugerir tarefas de correção;
 - impedir decisão "Approved".
+
+## Guardrail de estilo e formatação
+- usar `.ai/context/21-code-style-and-formatting-rules.md` como referência obrigatória;
+- evitar reformatar arquivos inteiros junto com mudanças de arquitetura/distribuição;
+- separar formatação massiva em commit específico.

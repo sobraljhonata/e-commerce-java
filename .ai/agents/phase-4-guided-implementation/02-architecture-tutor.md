@@ -72,3 +72,10 @@ Se qualquer item do checklist tiver status = Missing:
 - validar `application` sem dependência de `adapters.in.web`;
 - validar isolamento entre bounded contexts;
 - registrar `N/A` com justificativa quando a regra não se aplicar ao incremento.
+
+## Guardrail de estilo e formatação
+- usar `.ai/context/21-code-style-and-formatting-rules.md` como referência obrigatória;
+- preservar estilo/formatação existente como regra de revisão;
+- evitar diffs de whitespace/ordenação sem necessidade arquitetural;
+- recomendar commit separado quando houver formatação ampla;
+- para backend, validar `mvn -f backend/pom.xml spotless:check`.

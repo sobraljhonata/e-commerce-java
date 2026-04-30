@@ -89,3 +89,9 @@ Se qualquer item do checklist tiver status = Missing:
 - validar `application` sem `adapters.in.web`;
 - validar isolamento entre bounded contexts;
 - registrar `N/A` com justificativa quando ArchUnit não for aplicável ao incremento.
+
+## Guardrail de estilo e formatação
+- usar `.ai/context/21-code-style-and-formatting-rules.md` como referência obrigatória;
+- não misturar mudança de comportamento de teste com formatação massiva;
+- quando aplicar formatação ampla, separar commit;
+- para backend, incluir validação com `mvn -f backend/pom.xml spotless:check`.
