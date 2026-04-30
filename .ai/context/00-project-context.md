@@ -3,6 +3,14 @@
 ## Resumo
 Loja virtual desenvolvida para o Sebrae.
 
+## Estado atual da transformação (2026-04-29)
+- Discovery, Product e Greenfield concluídos.
+- Plataforma alvo: SaaS multi-tenant, monólito modular, hexagonal por BC.
+- Stack em implementação: Java 21 + Spring Boot 3.
+- JWT é a fonte de contexto autenticado.
+- `tenantId` vem exclusivamente do JWT/contexto autenticado para capacidades tenant-scoped.
+- BCs já iniciados/entregues na Wave 1 atual: Tenant (W1.1), IAM (W1.2 baseline), Catalog (Product e Category tenant-aware).
+
 ## Stack atual
 - API: .NET Core 2.1
 - Front-end: AngularJS

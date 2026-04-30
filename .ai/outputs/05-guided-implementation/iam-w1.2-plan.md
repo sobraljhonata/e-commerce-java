@@ -4,6 +4,10 @@
 **Base:** Phase 3 (`01-bounded-contexts-oficiais.md`, stack hexagonal), fechamento `tenant-w1.1-closeout.md`, agentes Phase 4 (implementação guiada).  
 **Premissas:** monólito modular, multi-tenant como capability central, **sem** reescrever o BC Tenant — **estender** a plataforma com IAM mínimo.
 
+> Atualização de estado (2026-04-29): este plano foi parcialmente executado.
+> O estado real atual já inclui login, JWT, proteção de `/api/admin/**`, `AuthenticatedUser` e `tenantId` no JWT/contexto autenticado.
+> Se houver conflito entre este plano e o estado implementado, prevalece o estado implementado e os closeouts em `.ai/outputs/05-guided-implementation/`.
+
 **Legenda**
 
 | Tag | Uso |
@@ -31,7 +35,7 @@
 | Impacto | Descrição |
 |---------|-----------|
 | **Padrão** | Todo BC com API administrativa reutiliza o mesmo esquema de **autenticação/autorização** (filtro + roles). |
-| **Tenant context** | Futuros use cases podem exigir `tenantId` no token ou membership — W1.2 prepara o modelo sem fechar todos os casos. |
+| **Tenant context** | W1.2 fechado com `tenantId` no JWT/contexto autenticado via `AuthenticatedUser`; membership fino por tenant segue para evolução. |
 | **Catálogo / Pedido** | Compradores (B2C) terão fluxo IAM separado depois; W1.2 foca **operador/plataforma**. |
 
 ---
@@ -42,7 +46,7 @@
 |------|---------------------|
 | **Autenticação básica** | **Login** com identificador + senha (ex.: email + password), resposta com **JWT** assinado localmente. |
 | **Modelo de usuário administrativo** | Entidade **User** (ou `PlatformUser`) com id, email único, hash de senha, estado ativo; **papéis** mínimos. |
-| **Associação com tenant** | **Mínimo viável:** suporte a papel **`PLATFORM_ADMIN`** (acesso global admin) **sem** membership por tenant na primeira entrega **ou** um único vínculo opcional `tenantId` no token para testes — **escolha documentada na implementação** (ver secção 10). |
+| **Associação com tenant** | **Mínimo viável implementado:** `PLATFORM_ADMIN` + `tenantId` no JWT/contexto autenticado; membership fino por tenant permanece evolutivo. |
 | **Autorização inicial** | **RBAC de duas faixas:** `ROLE_PLATFORM_ADMIN` (protege `/api/admin/**`) e reserva para `ROLE_TENANT_ADMIN` (pode ficar sem uso até haver dados de membership). |
 | **Proteção de endpoints admin** | **Spring Security** com regra: `/api/admin/**` exige autenticação + role adequada; `/api/auth/**` (ou equivalente) **público** para login. |
 
@@ -181,7 +185,7 @@ src/test/resources/features/bdd/iam_w12.feature
 | **Role** | Enum `PLATFORM_ADMIN`, `TENANT_ADMIN` (reservado). |
 | **AuthenticateUserUseCase** | `execute(email, password)` → `AuthResult` (token + expiração opcional) ou lança exceção de domínio. |
 | **UserRepository** | `findByEmail`, `save` (para seed). |
-| **TokenIssuerPort** | Gera string JWT com claims: `sub`, `roles`, opcional `tenant_id`. |
+| **TokenIssuerPort** | Gera string JWT com claims: `sub`, `roles`, `tenantId` (obrigatório para fluxos tenant-scoped). |
 | **PasswordHasherPort** | `matches(raw, hash)`. |
 | **AuthController** | Mapeia HTTP; não contém regra de negócio. |
 
@@ -219,7 +223,7 @@ src/test/resources/features/bdd/iam_w12.feature
 - **Opção A (mínima):** só `PLATFORM_ADMIN`; qualquer tenant acessível — aceitável para demo interna.  
 - **Opção B:** tabela `user_tenant_membership` (ou in-memory) com `(userId, tenantId, role)` — habilita `TENANT_ADMIN` **sem** misturar agregados entre pacotes (use **IDs** e validação na camada de aplicação ou filtro).
 
-**Recomendação:** W1.2 = **Opção A** + claim opcional `tenant_id` preparado no JWT **vazio** ou com valor de teste; membership explícita → **W1.3** ou incremento dedicado.
+**Atualização:** W1.2 efetiva já usa claim de tenant no JWT/contexto autenticado. Membership explícita por tenant continua como evolução (W1.3+).
 
 ---
 

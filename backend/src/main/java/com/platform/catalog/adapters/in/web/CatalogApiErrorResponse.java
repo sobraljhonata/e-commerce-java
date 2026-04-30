@@ -23,5 +23,9 @@ public record CatalogApiErrorResponse(String code, String message, List<FieldVio
         return new CatalogApiErrorResponse("PRODUCT_NOT_FOUND", message, List.of());
     }
 
+    public static CatalogApiErrorResponse categoryNotFound(String message) {
+        return new CatalogApiErrorResponse("CATEGORY_NOT_FOUND", message, List.of());
+    }
+
     public record FieldViolation(String field, String message) {}
 }

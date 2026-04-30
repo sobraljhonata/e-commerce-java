@@ -32,7 +32,8 @@ Proteger **`/api/admin/**`** com **Bearer JWT** validado na borda HTTP, mantendo
 | **Hexagonal:** domínio e casos de uso IAM **sem** dependência de Spring Security | **Confirmada** — segurança só em `com.platform.iam.config` + adaptadores. |
 | **Borda única para HTTP auth** | **Confirmada** — `SecurityFilterChain` + OAuth2 Resource Server (`JwtDecoder`). |
 | **Segredo e TTL únicos** | **Confirmada** — `JwtSecurityProperties` alimenta **emissor** e **decoder**; expiração de sessão via claim `exp` + TTL de emissão. |
-| **Papel mínimo** | **Confirmada** — `PLATFORM_ADMIN` para admin; sem refresh, sem OAuth externo, sem tenant no token neste incremento. |
+| **Papel mínimo** | **Confirmada** — `PLATFORM_ADMIN` para admin; sem refresh e sem OAuth externo. |
+| **Contexto autenticado tenant-aware** | **Consolidada na evolução W1.2** — `tenantId` presente no JWT e no `AuthenticatedUser`, utilizado pelos BCs tenant-scoped. |
 | **Pragmatismo Wave 1** | **Confirmada** — `anyRequest().permitAll()` até surgirem mais superfícies `/api/**` definidas. |
 
 ---
@@ -45,7 +46,7 @@ Proteger **`/api/admin/**`** com **Bearer JWT** validado na borda HTTP, mantendo
 | **Equivalência HS256 issuer/decoder** | **Débito de evidência:** compatível na prática; não há teste dedicado que nomeie “round-trip” como contrato formal. |
 | **CORS** | **Débito operacional:** não tratado; relevante quando houver SPA em outro origin. |
 | **Corpo de erro 401/403** | **Débito de UX/API:** respostas padrão do resource server; eventual alinhamento com `IamApiErrorResponse` é trabalho de borda. |
-| **Multi-tenant / escopo** | **Débito de produto:** token não carrega `tenant_id` nem membership; admin global não está restrito por tenant — esperado para W1.2, insuficiente para produção multi-tenant. |
+| **Multi-tenant / escopo** | **Débito remanescente:** membership fino usuário↔tenant ainda evolutivo; `tenantId` no JWT/contexto já está disponível e em uso nos fluxos tenant-scoped. |
 | **Actuator público** | **Débito de hardening:** `/actuator/**` permitido na config; revisão por ambiente (métricas, health) recomendada antes de produção. |
 
 ---
@@ -78,7 +79,7 @@ Proteger **`/api/admin/**`** com **Bearer JWT** validado na borda HTTP, mantendo
 ## 7. Próximos passos (linha do IAM / plataforma)
 
 1. **W1.2 restante ou W1.3:** refresh opcional, ou documentar “re-login” como política até nova wave.
-2. **Tenant no token + filtro de tenant** quando o BC Tenant exigir segregação por operador.
+2. **Evoluir membership por tenant** e regras de escopo por papel (`TENANT_ADMIN`, etc.) sobre a base já existente de `tenantId` no JWT/contexto.
 3. **Endurecimento:** política default para `anyRequest`, CORS, handlers de 401/403 alinhados ao contrato de erro da plataforma.
 4. **ArchUnit / pacotes:** manter regra “tenant não depende de iam.domain”; revisar se `iam.config` permanece só no BC IAM.
 

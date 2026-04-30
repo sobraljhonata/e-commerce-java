@@ -1,116 +1,54 @@
 # ADR Enforcement Map
 
-## ADR-01 — Greenfield
-Objetivo:
-- nenhum código legado entra no novo core
-Regra:
-- Nenhum módulo pode depender de código legado.
+Este mapa operacionaliza os ADRs aceitos em:
+- `.ai/outputs/03-architecture/12-adrs-principais.md`
 
-Validação:
-- inspeção de dependências
-- revisão de imports
-- CI check: ausência de pacotes legacy
-- proibir imports de pacotes legacy
-- revisão de dependências
-- CI falha se houver dependência proibida
+## ADR-001 — Greenfield sem reuso de código legado
+- Regra: novo core não depende de código legado.
+- Enforcement: revisão de imports/dependências + check de CI para pacotes proibidos.
 
----
+## ADR-002 — Monólito modular como padrão inicial
+- Regra: BCs não acessam persistence de outros BCs.
+- Enforcement: ArchUnit de boundary + revisão de uso de contratos/ports.
 
-## ADR-02 — Modular Monolith
-Objetivo:
-- bounded contexts não acessam persistência uns dos outros
-Regra:
-- módulos só se comunicam via contratos definidos
-- proibido acesso direto a persistence de outro BC
+## ADR-003 — Stack Java 21 / Spring Boot 3 / Angular / Postgres / Redis / AWS
+- Regra: manter baseline tecnológica da plataforma na Wave 1.
+- Enforcement: revisão de dependências e ADR complementar quando houver exceção.
 
-Validação:
-- ArchUnit rules
-- testes de boundary
+## ADR-004 — Multi-tenant por `tenant_id` com enforcement na aplicação
+- Regra: leitura/escrita tenant-scoped sempre com escopo de tenant.
+- Enforcement técnico: testes unitários/use case + repository + integração cross-tenant.
+- Enforcement de output: checklist obrigatório de `.ai/context/20-multi-tenant-validation-checklist-template.md` para incrementos tenant-scoped.
 
----
+## ADR-005 — Hexagonal por bounded context
+- Regra: domínio sem framework; adapters dependem do core, nunca o contrário.
+- Enforcement: ArchUnit de dependência unidirecional + estrutura de pacotes por BC.
 
-## ADR-03 — Hexagonal Architecture
-Objetivo:
-- domínio não depende de Spring nem de adapters
-Regra:
-- domínio não depende de framework
-- adapters dependem do core, nunca o contrário
+## ADR-006 — Outbox + sem Kafka na Wave 1
+- Regra: sem broker externo na Wave 1; eventos externos via outbox.
+- Enforcement: revisão de dependências + testes do fluxo de persistência/outbox quando aplicável.
 
-Validação:
-- ArchUnit: dependência unidirecional
-- pacotes separados: domain / application / adapters
+## ADR-007 — Sem SAGA distribuída no MVP
+- Regra: evitar coreografia distribuída no MVP.
+- Enforcement: revisão arquitetural; exigir justificativa formal para exceções.
 
----
+## ADR-008 — Payment isolado em BC dedicado
+- Regra: BC de pagamento com fronteira própria e integrações externas concentradas.
+- Enforcement: ArchUnit de boundary + testes de contrato/integridade de fluxo.
 
-## ADR-04 — Multi-tenant
-Objetivo:
-- toda leitura e escrita relevante respeita tenant_id
-Regra:
-- toda entidade tem tenant_id
-- toda query filtra tenant_id
+## ADR-009 — Design system de plataforma + tenant theming limitado
+- Regra: UI deve usar tokens/primitives; theming controlado por política.
+- Enforcement: lint/review de UI + check de aderência ao design system.
 
-Validação:
-- testes de segregação tenant A vs tenant B
-- testes de integração com filtros obrigatórios
-- testes automáticos de segregação
-- interceptors obrigatórios
-- testes de vazamento cross-tenant
+## ADR-010 — IA (MCP/RAG) fora do core transacional
+- Regra: IA fora de auth/pagamento/consistência transacional.
+- Enforcement: revisão de desenho + checklist de risco operacional.
+
+## ADR-011 — Integrações Sebrae via Integration Hub
+- Regra: BC11 é fronteira oficial para integrações legadas/externas.
+- Enforcement: revisão de arquitetura + proibição de acesso direto a integrações fora do hub.
 
 ---
 
-## ADR-05 — Outbox
-Regra:
-- todo evento persistido via outbox
-- nenhum publish direto fora de transação
-
-Validação:
-- testes de persistência + publish
-- revisão de adapters
-
----
-
-## ADR-06 — No Kafka (Wave 1)
-Regra:
-- proibido uso de brokers externos
-
-Validação:
-- verificação de dependências
-
----
-
-## ADR-07 — Payment Isolation
-Regra:
-- Payment não pode ser chamado diretamente por outros BCs
-- comunicação via Application Service
-
-Validação:
-- ArchUnit + testes de boundary
-
----
-
-## ADR-08 — Design System
-Regra:
-- UI deve usar tokens e primitives
-- proibido CSS solto fora do DS
-
-Validação:
-- lint rules
-- revisão de componentes
-
----
-
-## ADR-09 — MCP/RAG fora do core
-Regra:
-- nenhuma chamada de IA no fluxo transacional
-
-Validação:
-- revisão de dependências
-- testes de latência
-
-## ADR-10 — OpenAPI
-Objetivo:
-- contrato da API não quebra silenciosamente
-
-Validação:
-- geração do spec no build
-- falha se não gerar
+## Nota
+`OpenAPI` permanece prática recomendada de governança de contrato, mas não é ADR principal listado em `12-adrs-principais.md`.

@@ -1,5 +1,9 @@
 # Fechamento técnico — BC Tenant (W1.1)
 
+> Nota de contexto (2026-04-29): este documento é um fechamento histórico da W1.1.
+> O estado atual da plataforma já evoluiu com IAM W1.2 (login, JWT, proteção admin, `AuthenticatedUser`, `tenantId` no JWT/contexto) e Catalog tenant-aware.
+> Use este artefato como linha de base de Tenant; para estado corrente, cruzar com os closeouts de IAM/Catalog em `.ai/outputs/05-guided-implementation/`.
+
 **Papel:** arquitetura / referência para próximos bounded contexts.  
 **Base:** código em `backend/` (pacote `com.platform.tenant`), outputs de fases anteriores e agentes Phase 4 (implementação guiada).  
 **Escopo:** apenas documentação; **nenhuma alteração de código** neste artefato.
@@ -180,7 +184,7 @@ com.platform.tenant/
 | Débito | **Fato** / **Observação** |
 |--------|---------------------------|
 | **Persistência** | **Fato:** Apenas `InMemoryTenantRepository`; sem Flyway/JPA. |
-| **Segurança** | **Fato:** Endpoints `/api/admin/...` sem autenticação/autorização no módulo. |
+| **Segurança** | **Fato histórico da W1.1:** Endpoints `/api/admin/...` sem autenticação/autorização no módulo. **Atualização:** coberto por IAM W1.2 na borda HTTP. |
 | **Eventos de domínio** | **Fato:** Nenhum `TenantCreated` / `TenantDeactivated` publicado (outbox, etc.). |
 | **`IllegalArgumentException`** | **Fato:** Usado em fluxos de argumento inválido; handler genérico `INVALID_REQUEST` — pode capturar outros `IAE` na mesma cadeia. |
 | **Slug como tipo** | **Observação:** Não há value object `Slug`; regra está em `Tenant.canonicalSlug`. |

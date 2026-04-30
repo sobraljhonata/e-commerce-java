@@ -9,9 +9,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.platform.catalog.application.AuthenticatedContextRequiredException;
+import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.ProductNotFoundException;
 
-@RestControllerAdvice(assignableTypes = ProductController.class)
+@RestControllerAdvice(assignableTypes = {ProductController.class, CategoryController.class})
 public class CatalogExceptionHandler {
 
     @ExceptionHandler(AuthenticatedContextRequiredException.class)
@@ -23,6 +24,12 @@ public class CatalogExceptionHandler {
     public ResponseEntity<CatalogApiErrorResponse> handleProductNotFound(ProductNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(CatalogApiErrorResponse.productNotFound(ex.getMessage()));
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<CatalogApiErrorResponse> handleCategoryNotFound(CategoryNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(CatalogApiErrorResponse.categoryNotFound(ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

@@ -65,5 +65,5 @@ mvn spring-boot:run
 ## 8. Observações de arquitetura
 
 - **Hexagonal:** regras de autenticação de credenciais permanecem no `LoginUseCase`; Spring Security só valida JWT na borda.
-- **Wave 1:** apenas `ROLE_PLATFORM_ADMIN` para `/api/admin/**`; sem refresh, sem tenant no token neste incremento.
+- **Wave 1:** apenas `ROLE_PLATFORM_ADMIN` para `/api/admin/**`; sem refresh. Na evolução W1.2, `tenantId` foi incorporado ao JWT/contexto autenticado para consumo dos BCs tenant-scoped.
 - **Cucumber:** glue em `com.platform.bdd.iam.api` sem `@Component` nas step definitions (exigência cucumber-spring).
