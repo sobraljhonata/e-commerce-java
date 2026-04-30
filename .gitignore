@@ -107,6 +107,10 @@ jacoco.exec
 .cache/
 .eslintcache
 
+# Garantir que artefatos de arquitetura e agentes continuem versionados
+!.ai/
+!.ai/**
+
 ##################################
 # AI / Generated outputs (opcional)
 ##################################

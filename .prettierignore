@@ -1,5 +1,9 @@
 backend/target/
+target/
 frontend/node_modules/
+node_modules/
+dist/
+coverage/
 .m2/
 .git/
 .idea/

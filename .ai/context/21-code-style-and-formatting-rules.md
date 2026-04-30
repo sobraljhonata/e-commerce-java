@@ -24,7 +24,11 @@ Padronizar estilo e formatação sem misturar mudanças funcionais com refactors
 
 4. **Ferramentas padrão do projeto**
    - Backend Java: Spotless.
-   - Arquivos gerais (JSON/Markdown/etc. quando aplicável): Prettier.
+   - Arquivos web/docs/config (JSON/Markdown/YAML/TS/JS/CSS/SCSS/HTML, quando aplicável): Prettier.
+
+5. **Versionamento de artefatos**
+   - `.m2/` não deve ser versionado.
+   - `.ai/` deve continuar versionado (contextos, agentes, outputs arquiteturais).
 
 ## Validação mínima
 
@@ -42,27 +46,3 @@ Este contexto **não substitui** os normativos de multi-tenant:
 - `.ai/context/20-multi-tenant-validation-checklist-template.md`
 
 Ele apenas adiciona disciplina de estilo/formatação ao fluxo de entrega.
-# Code Style and Formatting Rules
-
-## Objetivo
-Garantir consistência de formatação, indentação, quebra de linha, imports e estilo de código.
-
-## Regras obrigatórias
-- Usar `.editorconfig` na raiz.
-- Usar `.gitattributes` com `eol=lf`.
-- Backend Java deve usar Spotless.
-- Frontend deve usar Prettier/ESLint.
-- CI deve validar formatação.
-- Commits não devem conter mudanças apenas de line endings ou formatação acidental.
-
-## Backend
-- Java formatado via Spotless.
-- Imports não utilizados devem ser removidos.
-- `mvn spotless:check` deve passar antes do merge.
-
-## Frontend
-- TypeScript, JSON, CSS, SCSS e Markdown formatados com Prettier.
-- ESLint deve validar qualidade de código.
-
-## Regra para agentes
-Todo agente que gerar código deve respeitar os arquivos de formatação existentes e não misturar refatoração funcional com formatação massiva.
