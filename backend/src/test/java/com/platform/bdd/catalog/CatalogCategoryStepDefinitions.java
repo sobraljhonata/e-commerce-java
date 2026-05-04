@@ -34,6 +34,8 @@ public class CatalogCategoryStepDefinitions {
   private String lastCategoryId;
   private int lastGetStatus;
   private JsonNode lastGetJson;
+  private int lastListStatus;
+  private JsonNode lastListJson;
 
   @Before
   public void reset() {
@@ -44,6 +46,8 @@ public class CatalogCategoryStepDefinitions {
     lastCategoryId = null;
     lastGetStatus = 0;
     lastGetJson = null;
+    lastListStatus = 0;
+    lastListJson = null;
   }
 
   @Dado("que o operador de categorias está autenticado como admin de plataforma")
@@ -131,5 +135,56 @@ public class CatalogCategoryStepDefinitions {
   public void nomeCategoriaConsulta(String nomeEsperado) {
     assertNotNull(lastGetJson);
     assertEquals(nomeEsperado, lastGetJson.get("name").asText());
+  }
+
+  @E("que duas categorias foram cadastradas para listagem")
+  public void cadastraDuasParaListagem() throws Exception {
+    postCategoria("Alpha");
+    assertEquals(201, lastStatus);
+    postCategoria("Beta");
+    assertEquals(201, lastStatus);
+  }
+
+  private void postCategoria(String nome) throws Exception {
+    var res =
+        mockMvc
+            .perform(
+                post("/api/admin/categories")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .contentType(APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(new CreateCategoryRequest(nome, true))))
+            .andReturn()
+            .getResponse();
+    lastStatus = res.getStatus();
+    String body = res.getContentAsString();
+    lastJson = body.isBlank() ? null : mapper.readTree(body);
+  }
+
+  @Quando("lista as categorias")
+  public void listaCategorias() throws Exception {
+    var res =
+        mockMvc
+            .perform(get("/api/admin/categories").header("Authorization", "Bearer " + bearerToken))
+            .andReturn()
+            .getResponse();
+    lastListStatus = res.getStatus();
+    String body = res.getContentAsString();
+    lastListJson = body.isBlank() ? null : mapper.readTree(body);
+  }
+
+  @Então("a resposta da listagem de categorias é 200")
+  public void listagem200() {
+    assertEquals(200, lastListStatus);
+  }
+
+  @Então("a listagem de categorias contém {int} itens do tenant seed")
+  public void listagemTamanhoETenant(int esperado) {
+    assertNotNull(lastListJson);
+    assertEquals(esperado, lastListJson.size());
+    for (int i = 0; i < lastListJson.size(); i++) {
+      assertEquals(
+          InMemoryAdminUserRepository.SEED_TENANT_ID.toString(),
+          lastListJson.get(i).get("tenantId").asText());
+    }
   }
 }

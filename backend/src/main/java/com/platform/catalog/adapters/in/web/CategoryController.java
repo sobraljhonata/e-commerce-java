@@ -2,7 +2,9 @@ package com.platform.catalog.adapters.in.web;
 
 import com.platform.catalog.application.CreateCategoryUseCase;
 import com.platform.catalog.application.GetCategoryByIdUseCase;
+import com.platform.catalog.application.ListCategoriesUseCase;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,11 +21,15 @@ public class CategoryController {
 
   private final CreateCategoryUseCase createCategoryUseCase;
   private final GetCategoryByIdUseCase getCategoryByIdUseCase;
+  private final ListCategoriesUseCase listCategoriesUseCase;
 
   public CategoryController(
-      CreateCategoryUseCase createCategoryUseCase, GetCategoryByIdUseCase getCategoryByIdUseCase) {
+      CreateCategoryUseCase createCategoryUseCase,
+      GetCategoryByIdUseCase getCategoryByIdUseCase,
+      ListCategoriesUseCase listCategoriesUseCase) {
     this.createCategoryUseCase = createCategoryUseCase;
     this.getCategoryByIdUseCase = getCategoryByIdUseCase;
+    this.listCategoriesUseCase = listCategoriesUseCase;
   }
 
   @PostMapping
@@ -36,5 +42,10 @@ public class CategoryController {
   @GetMapping("/{id}")
   public CategoryResponse getById(@PathVariable UUID id) {
     return CategoryResponse.from(getCategoryByIdUseCase.execute(id));
+  }
+
+  @GetMapping
+  public List<CategoryResponse> list() {
+    return listCategoriesUseCase.execute().stream().map(CategoryResponse::from).toList();
   }
 }

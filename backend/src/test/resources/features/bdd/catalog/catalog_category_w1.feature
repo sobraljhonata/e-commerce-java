@@ -16,3 +16,10 @@ Funcionalidade: Cadastro de categoria (Catalog W1 — incremento 5)
     Quando consulta essa categoria pelo id do cadastro
     Então a resposta da consulta de categoria é 200
     E o nome da categoria retornada é "Esportes"
+
+  Cenário: Listagem retorna apenas categorias do tenant autenticado
+    Dado que o operador de categorias está autenticado como admin de plataforma
+    E que duas categorias foram cadastradas para listagem
+    Quando lista as categorias
+    Então a resposta da listagem de categorias é 200
+    E a listagem de categorias contém 2 itens do tenant seed

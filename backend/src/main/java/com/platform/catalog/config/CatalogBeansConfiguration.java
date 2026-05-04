@@ -7,6 +7,7 @@ import com.platform.catalog.application.CreateCategoryUseCase;
 import com.platform.catalog.application.CreateProductUseCase;
 import com.platform.catalog.application.GetCategoryByIdUseCase;
 import com.platform.catalog.application.GetProductByIdUseCase;
+import com.platform.catalog.application.ListCategoriesUseCase;
 import com.platform.catalog.application.ListProductsUseCase;
 import com.platform.catalog.application.ProductRepository;
 import com.platform.catalog.application.UpdateProductUseCase;
@@ -49,6 +50,12 @@ public class CatalogBeansConfiguration {
   GetCategoryByIdUseCase getCategoryByIdUseCase(
       CategoryRepository categories, CurrentUserProvider currentUserProvider) {
     return new GetCategoryByIdUseCase(categories, currentUserProvider);
+  }
+
+  @Bean
+  ListCategoriesUseCase listCategoriesUseCase(
+      CategoryRepository categories, CurrentUserProvider currentUserProvider) {
+    return new ListCategoriesUseCase(categories, currentUserProvider);
   }
 
   @Bean

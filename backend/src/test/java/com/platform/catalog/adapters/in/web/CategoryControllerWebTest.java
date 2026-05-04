@@ -12,8 +12,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.catalog.application.CreateCategoryUseCase;
 import com.platform.catalog.application.GetCategoryByIdUseCase;
+import com.platform.catalog.application.ListCategoriesUseCase;
 import com.platform.catalog.domain.Category;
 import com.platform.catalog.domain.CategoryNotFoundException;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,6 +36,8 @@ class CategoryControllerWebTest {
   @Mock private CreateCategoryUseCase createCategoryUseCase;
 
   @Mock private GetCategoryByIdUseCase getCategoryByIdUseCase;
+
+  @Mock private ListCategoriesUseCase listCategoriesUseCase;
 
   @InjectMocks private CategoryController categoryController;
 
@@ -121,5 +125,29 @@ class CategoryControllerWebTest {
         .perform(get("/api/admin/categories/" + id))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("CATEGORY_NOT_FOUND"));
+  }
+
+  @Test
+  void get_list_returns_200_with_array() throws Exception {
+    UUID id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    Category category = Category.restore(id, TENANT, "Roupas", true);
+    when(listCategoriesUseCase.execute()).thenReturn(List.of(category));
+
+    mockMvc
+        .perform(get("/api/admin/categories"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$[0].id").value(id.toString()))
+        .andExpect(jsonPath("$[0].name").value("Roupas"));
+  }
+
+  @Test
+  void get_list_returns_200_with_empty_array() throws Exception {
+    when(listCategoriesUseCase.execute()).thenReturn(List.of());
+
+    mockMvc
+        .perform(get("/api/admin/categories"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(0));
   }
 }

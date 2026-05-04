@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.platform.catalog.domain.Category;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -30,5 +31,18 @@ class InMemoryCategoryRepositoryTest {
     repo.save(category);
 
     assertEquals(category, repo.findByIdAndTenant(TENANT_A, id).orElseThrow());
+  }
+
+  @Test
+  void findAllByTenant_excludes_categories_from_other_tenants() {
+    var repo = new InMemoryCategoryRepository();
+    UUID idA = UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
+    UUID idB = UUID.fromString("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+    repo.save(Category.restore(idA, TENANT_A, "A", true));
+    repo.save(Category.restore(idB, TENANT_B, "B", true));
+
+    List<Category> list = repo.findAllByTenant(TENANT_A);
+    assertEquals(1, list.size());
+    assertEquals(idA, list.get(0).id());
   }
 }
