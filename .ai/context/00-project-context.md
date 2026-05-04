@@ -46,3 +46,31 @@ Loja virtual desenvolvida para o Sebrae.
 4. Gerar backlog e MVP
 5. Avaliar modernização da stack
 6. Projetar plataforma moderna e escalável
+
+## Engineering governance bootstrap
+
+Entrypoint de governança para **engenharia assistida por IA** (Phase 4 e trabalho alinhado): o utilizador descreve o **incremento**; regras transversais vivem nos artefactos abaixo.
+
+### Pacote normativo (ler nesta ordem de precedência)
+
+| # | Artefacto | Papel |
+|---|------------|--------|
+| **16** | `.ai/outputs/03-architecture/16-platform-implementation-standards.md` | **ADR** — padrões de implementação da plataforma (hexágono, multi-tenant, testes, formatação). |
+| **19** | `.ai/context/19-multi-tenant-testing-rules.md` | Regras de teste e isolamento multi-tenant. |
+| **20** | `.ai/context/20-multi-tenant-validation-checklist-template.md` | Template obrigatório do checklist em entregas tenant-scoped. |
+| **21** | `.ai/context/21-code-style-and-formatting-rules.md` | Estilo, formatação, commits. |
+| **22** | `.ai/context/22-prompt-defaults.md` | Defaults de prompt e ligação ao pacote acima. |
+| **23** | `.ai/context/23-output-template.md` | Estrutura mínima de entrega (9 secções). |
+| **24** | `.ai/context/24-increment-classification.md` | Classificação de incrementos e regras por tipo (agentes inferem o tipo). |
+
+*(O **16** é ADR em `outputs/`; **19–24** são contextos em `.ai/context/`.)*
+
+### Hierarquia de autoridade
+
+1. **ADR / outputs de arquitetura** (ex.: **16**, e documentos em `.ai/outputs/03-architecture/`) — decisões estáveis; prevalecem em conflito.
+2. **Contextos normativos** (19–24 e demais em `.ai/context/`) — operacionalizam ADRs e políticas de produto.
+3. **Agentes** (`.ai/agents/phase-4-guided-implementation/*.md`) — comportamento e checklist de execução no IDE; **não** redefinem ADR nem contradizem contextos.
+
+### Regra para prompts
+
+**Não é necessário repetir** no prompt as regras já cobertas pelo pacote **16 + 19–24** e pelos agentes Phase 4, salvo exceção pontual (ex.: política experimental ainda não documentada). Basta indicar BC, tipo ou descrição do incremento e o resultado esperado; ver `.ai/context/22-prompt-defaults.md`.

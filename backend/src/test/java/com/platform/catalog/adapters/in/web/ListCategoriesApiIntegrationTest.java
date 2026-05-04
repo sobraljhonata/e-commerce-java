@@ -8,11 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platform.Wave1BackendApplication;
+import com.platform.catalog.adapters.out.persistence.InMemoryCategoryRepository;
 import com.platform.iam.adapters.in.web.LoginRequest;
 import com.platform.iam.adapters.out.persistence.InMemoryAdminUserRepository;
 import com.platform.iam.domain.AdminRole;
 import com.platform.iam.domain.AdminUser;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,13 @@ class ListCategoriesApiIntegrationTest {
   @Autowired private MockMvc mockMvc;
 
   @Autowired private InMemoryAdminUserRepository adminUsers;
+
+  @Autowired private InMemoryCategoryRepository categoryRepository;
+
+  @BeforeEach
+  void clearCategories() {
+    categoryRepository.clear();
+  }
 
   private String bearerToken(String email, String password) throws Exception {
     String loginBody =
@@ -91,5 +100,44 @@ class ListCategoriesApiIntegrationTest {
         .perform(get("/api/admin/categories").header("Authorization", "Bearer " + tenantBToken))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.length()").value(0));
+  }
+
+  @Test
+  @DisplayName("GET /api/admin/categories: tenant A não lista categorias do tenant B")
+  void list_tenant_a_does_not_include_tenant_b_categories() throws Exception {
+    String tenantAToken =
+        bearerToken(
+            InMemoryAdminUserRepository.SEED_EMAIL, InMemoryAdminUserRepository.SEED_PASSWORD);
+    mockMvc
+        .perform(
+            post("/api/admin/categories")
+                .header("Authorization", "Bearer " + tenantAToken)
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(new CreateCategoryRequest("Moda", true))))
+        .andExpect(status().isCreated());
+
+    adminUsers.save(
+        AdminUser.restore(
+            UUID.fromString("eeeeeeee-ffff-1111-2222-333333333333"),
+            TENANT_B_ID,
+            "tenantb-list-only-b@local.dev",
+            new BCryptPasswordEncoder().encode(TENANT_B_PASSWORD),
+            true,
+            AdminRole.PLATFORM_ADMIN));
+    String tenantBToken = bearerToken("tenantb-list-only-b@local.dev", TENANT_B_PASSWORD);
+
+    mockMvc
+        .perform(
+            post("/api/admin/categories")
+                .header("Authorization", "Bearer " + tenantBToken)
+                .contentType(APPLICATION_JSON)
+                .content(mapper.writeValueAsString(new CreateCategoryRequest("Livros", true))))
+        .andExpect(status().isCreated());
+
+    mockMvc
+        .perform(get("/api/admin/categories").header("Authorization", "Bearer " + tenantAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$[0].name").value("Moda"));
   }
 }

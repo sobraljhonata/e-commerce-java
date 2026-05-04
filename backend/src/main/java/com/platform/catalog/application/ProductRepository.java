@@ -17,4 +17,10 @@ public interface ProductRepository {
 
   /** Todos os produtos do tenant (ordem definida pelo adaptador de persistência). */
   List<Product> findAllByTenant(UUID tenantId);
+
+  /**
+   * Produtos do tenant com {@link Product#categoryId()} igual a {@code categoryId}. Categorias sem
+   * produto associado resultam em lista vazia.
+   */
+  List<Product> findAllByTenantAndCategoryId(UUID tenantId, UUID categoryId);
 }

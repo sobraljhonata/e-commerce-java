@@ -30,8 +30,10 @@ public class CatalogBeansConfiguration {
 
   @Bean
   CreateProductUseCase createProductUseCase(
-      ProductRepository products, CurrentUserProvider currentUserProvider) {
-    return new CreateProductUseCase(products, currentUserProvider);
+      ProductRepository products,
+      CategoryRepository categories,
+      CurrentUserProvider currentUserProvider) {
+    return new CreateProductUseCase(products, categories, currentUserProvider);
   }
 
   @Bean
@@ -60,13 +62,17 @@ public class CatalogBeansConfiguration {
 
   @Bean
   ListProductsUseCase listProductsUseCase(
-      ProductRepository products, CurrentUserProvider currentUserProvider) {
-    return new ListProductsUseCase(products, currentUserProvider);
+      ProductRepository products,
+      CategoryRepository categories,
+      CurrentUserProvider currentUserProvider) {
+    return new ListProductsUseCase(products, categories, currentUserProvider);
   }
 
   @Bean
   UpdateProductUseCase updateProductUseCase(
-      ProductRepository products, CurrentUserProvider currentUserProvider) {
-    return new UpdateProductUseCase(products, currentUserProvider);
+      ProductRepository products,
+      CategoryRepository categories,
+      CurrentUserProvider currentUserProvider) {
+    return new UpdateProductUseCase(products, categories, currentUserProvider);
   }
 }

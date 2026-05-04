@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -38,8 +39,10 @@ public class ProductController {
   }
 
   @GetMapping
-  public List<ProductResponse> list() {
-    return this.listProductsUseCase.execute().stream().map(ProductResponse::from).toList();
+  public List<ProductResponse> list(@RequestParam(required = false) UUID categoryId) {
+    return this.listProductsUseCase.execute(categoryId).stream()
+        .map(ProductResponse::from)
+        .toList();
   }
 
   @PostMapping
@@ -47,7 +50,8 @@ public class ProductController {
   public ProductResponse create(@Valid @RequestBody CreateProductRequest request) {
     boolean active = request.active() != null ? request.active() : true;
     return ProductResponse.from(
-        this.createProductUseCase.execute(request.name(), request.price(), active));
+        this.createProductUseCase.execute(
+            request.name(), request.price(), active, request.categoryId()));
   }
 
   @GetMapping("/{id}")
@@ -59,6 +63,7 @@ public class ProductController {
   public ProductResponse update(
       @PathVariable UUID id, @Valid @RequestBody UpdateProductRequest request) {
     return ProductResponse.from(
-        this.updateProductUseCase.execute(id, request.name(), request.price(), request.active()));
+        this.updateProductUseCase.execute(
+            id, request.name(), request.price(), request.active(), request.categoryId()));
   }
 }

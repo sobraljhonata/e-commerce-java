@@ -15,12 +15,17 @@ public final class Product {
   private final BigDecimal price;
   private final boolean active;
 
-  private Product(UUID id, UUID tenantId, String name, BigDecimal price, boolean active) {
+  /** Referência opcional a categoria do mesmo tenant ({@code null} = sem categoria). */
+  private final UUID categoryId;
+
+  private Product(
+      UUID id, UUID tenantId, String name, BigDecimal price, boolean active, UUID categoryId) {
     this.id = Objects.requireNonNull(id);
     this.tenantId = Objects.requireNonNull(tenantId);
     this.name = Objects.requireNonNull(name);
     this.price = Objects.requireNonNull(price);
     this.active = active;
+    this.categoryId = categoryId;
   }
 
   private static String requireName(String name) {
@@ -48,24 +53,32 @@ public final class Product {
   /**
    * Novo produto no tenant indicado. {@code price} deve ser &gt; 0; escala excessiva é rejeitada
    * para manter valores comerciais simples na Wave 1.
+   *
+   * @param categoryId identificador de categoria do mesmo tenant, ou {@code null} se o produto não
+   *     tiver categoria
    */
-  public static Product create(UUID tenantId, String name, BigDecimal price, boolean active) {
+  public static Product create(
+      UUID tenantId, String name, BigDecimal price, boolean active, UUID categoryId) {
     Objects.requireNonNull(tenantId, "tenantId");
-    return new Product(UUID.randomUUID(), tenantId, requireName(name), requirePrice(price), active);
+    return new Product(
+        UUID.randomUUID(), tenantId, requireName(name), requirePrice(price), active, categoryId);
   }
 
   /**
    * Atualização controlada dos atributos mutáveis. {@code id} e {@code tenantId} permanecem os
    * mesmos.
+   *
+   * @param categoryId categoria associada após a atualização ({@code null} = produto sem categoria)
    */
-  public Product update(String name, BigDecimal price, boolean active) {
-    return new Product(this.id, this.tenantId, requireName(name), requirePrice(price), active);
+  public Product update(String name, BigDecimal price, boolean active, UUID categoryId) {
+    return new Product(
+        this.id, this.tenantId, requireName(name), requirePrice(price), active, categoryId);
   }
 
   /** Reconstituição (ex.: persistência futura). */
   public static Product restore(
-      UUID id, UUID tenantId, String name, BigDecimal price, boolean active) {
-    return new Product(id, tenantId, name, price, active);
+      UUID id, UUID tenantId, String name, BigDecimal price, boolean active, UUID categoryId) {
+    return new Product(id, tenantId, name, price, active, categoryId);
   }
 
   public UUID id() {
@@ -86,5 +99,9 @@ public final class Product {
 
   public boolean active() {
     return active;
+  }
+
+  public UUID categoryId() {
+    return categoryId;
   }
 }

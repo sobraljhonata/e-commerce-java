@@ -5,6 +5,7 @@ import com.platform.catalog.domain.Product;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +40,15 @@ public final class InMemoryProductRepository implements ProductRepository {
   public List<Product> findAllByTenant(UUID tenantId) {
     return byId.values().stream()
         .filter(p -> p.tenantId().equals(tenantId))
+        .sorted(Comparator.comparing(Product::id))
+        .toList();
+  }
+
+  @Override
+  public List<Product> findAllByTenantAndCategoryId(UUID tenantId, UUID categoryId) {
+    return byId.values().stream()
+        .filter(p -> p.tenantId().equals(tenantId))
+        .filter(p -> p.categoryId() != null && Objects.equals(p.categoryId(), categoryId))
         .sorted(Comparator.comparing(Product::id))
         .toList();
   }

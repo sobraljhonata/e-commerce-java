@@ -59,7 +59,7 @@ class UpdateProductApiIntegrationTest {
                     .content(
                         mapper.writeValueAsString(
                             new CreateProductRequest(
-                                "Antes", new java.math.BigDecimal("10.00"), true))))
+                                "Antes", new java.math.BigDecimal("10.00"), true, null))))
             .andExpect(status().isCreated())
             .andReturn()
             .getResponse()
@@ -76,7 +76,7 @@ class UpdateProductApiIntegrationTest {
                 .content(
                     mapper.writeValueAsString(
                         new UpdateProductRequest(
-                            "Depois", new java.math.BigDecimal("20.00"), false))))
+                            "Depois", new java.math.BigDecimal("20.00"), false, null))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(id))
         .andExpect(jsonPath("$.name").value("Depois"))
@@ -105,7 +105,8 @@ class UpdateProductApiIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(
                     mapper.writeValueAsString(
-                        new UpdateProductRequest("X", new java.math.BigDecimal("1.00"), true))))
+                        new UpdateProductRequest(
+                            "X", new java.math.BigDecimal("1.00"), true, null))))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("PRODUCT_NOT_FOUND"));
   }
@@ -119,7 +120,8 @@ class UpdateProductApiIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(
                     mapper.writeValueAsString(
-                        new UpdateProductRequest("X", new java.math.BigDecimal("1.00"), true))))
+                        new UpdateProductRequest(
+                            "X", new java.math.BigDecimal("1.00"), true, null))))
         .andExpect(status().isUnauthorized());
   }
 }

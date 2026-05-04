@@ -34,7 +34,7 @@ class GetProductByIdUseCaseTest {
   @Test
   void returns_product_when_same_tenant() {
     UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
-    Product p = Product.restore(productId, TENANT, "Item", BigDecimal.TEN, true);
+    Product p = Product.restore(productId, TENANT, "Item", BigDecimal.TEN, true, null);
     when(currentUserProvider.currentUser())
         .thenReturn(
             Optional.of(

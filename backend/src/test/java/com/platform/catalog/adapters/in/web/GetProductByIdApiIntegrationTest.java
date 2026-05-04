@@ -58,7 +58,7 @@ class GetProductByIdApiIntegrationTest {
                     .content(
                         mapper.writeValueAsString(
                             new CreateProductRequest(
-                                "Livro", new java.math.BigDecimal("59.90"), true))))
+                                "Livro", new java.math.BigDecimal("59.90"), true, null))))
             .andExpect(status().isCreated())
             .andReturn()
             .getResponse()

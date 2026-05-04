@@ -34,7 +34,7 @@ class CreateProductApiIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(
                     mapper.writeValueAsString(
-                        new CreateProductRequest("P", java.math.BigDecimal.ONE, true))))
+                        new CreateProductRequest("P", java.math.BigDecimal.ONE, true, null))))
         .andExpect(status().isUnauthorized());
   }
 
@@ -66,12 +66,48 @@ class CreateProductApiIntegrationTest {
                 .content(
                     mapper.writeValueAsString(
                         new CreateProductRequest(
-                            "Camiseta básica", new java.math.BigDecimal("39.99"), true))))
+                            "Camiseta básica", new java.math.BigDecimal("39.99"), true, null))))
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.name").value("Camiseta básica"))
         .andExpect(
             jsonPath("$.tenantId").value(InMemoryAdminUserRepository.SEED_TENANT_ID.toString()))
         .andExpect(jsonPath("$.active").value(true))
         .andExpect(jsonPath("$.id").exists());
+  }
+
+  @Test
+  @DisplayName(
+      "POST /api/admin/products: tenantId no JSON é ignorado; tenant do produto é o do JWT")
+  void tenant_id_in_json_body_does_not_override_jwt_tenant() throws Exception {
+    String loginBody =
+        mockMvc
+            .perform(
+                post("/api/auth/login")
+                    .contentType(APPLICATION_JSON)
+                    .content(
+                        mapper.writeValueAsString(
+                            new LoginRequest(
+                                InMemoryAdminUserRepository.SEED_EMAIL,
+                                InMemoryAdminUserRepository.SEED_PASSWORD))))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+
+    String token = mapper.readTree(loginBody).get("accessToken").asText();
+    String otherTenant = "22222222-3333-4444-5555-666666666666";
+
+    mockMvc
+        .perform(
+            post("/api/admin/products")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content(
+                    "{\"name\":\"Tee\",\"price\":19.99,\"active\":true,\"tenantId\":\""
+                        + otherTenant
+                        + "\"}"))
+        .andExpect(status().isCreated())
+        .andExpect(
+            jsonPath("$.tenantId").value(InMemoryAdminUserRepository.SEED_TENANT_ID.toString()));
   }
 }
