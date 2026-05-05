@@ -17,6 +17,7 @@ Guiar a implementação com testes e descoberta orientada por comportamento.
 - exemplo concreto
 - regra de negócio em linguagem de negócio
 - alinhamento entre história e teste
+- BDD step texts devem ser específicos por contexto/feature para evitar DuplicateStepDefinition.
 
 ## Para cada incremento
 - propor cenários BDD
