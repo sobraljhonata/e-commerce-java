@@ -106,3 +106,20 @@ Este agente deve inferir o tipo de incremento e aplicar as regras de:
 - `.ai/context/24-increment-classification.md`
 
 Em caso de dúvida, usar o perfil **mais restritivo** aplicável ou **uma** pergunta de clarificação.
+
+## Definition of Done
+
+Este agente deve validar o incremento conforme:
+
+- `.ai/context/25-definition-of-done.md`
+
+## Self-check
+
+Antes de finalizar qualquer entrega/revisão, este agente deve aplicar:
+
+- `.ai/context/26-agent-self-check.md`
+
+Se qualquer item obrigatório falhar:
+- corrigir antes de finalizar;
+- ou declarar explicitamente pendência/risco;
+- não marcar como Approved/Done sem ressalvas.

@@ -1,5 +1,6 @@
 package com.platform.catalog.application;
 
+import com.platform.catalog.domain.CategoryInactiveException;
 import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.Product;
 import com.platform.catalog.domain.ProductNotFoundException;
@@ -45,8 +46,12 @@ public final class UpdateProductUseCase {
     if (categoryId == null) {
       return;
     }
-    categories
-        .findByIdAndTenant(tenantId, categoryId)
-        .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+    var category =
+        categories
+            .findByIdAndTenant(tenantId, categoryId)
+            .orElseThrow(() -> new CategoryNotFoundException(categoryId));
+    if (!category.active()) {
+      throw new CategoryInactiveException(categoryId);
+    }
   }
 }

@@ -1,6 +1,7 @@
 package com.platform.catalog.adapters.in.web;
 
 import com.platform.catalog.application.AuthenticatedContextRequiredException;
+import com.platform.catalog.domain.CategoryInactiveException;
 import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.ProductNotFoundException;
 import java.util.stream.Collectors;
@@ -32,6 +33,13 @@ public class CatalogExceptionHandler {
       CategoryNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(CatalogApiErrorResponse.categoryNotFound(ex.getMessage()));
+  }
+
+  @ExceptionHandler(CategoryInactiveException.class)
+  public ResponseEntity<CatalogApiErrorResponse> handleCategoryInactive(
+      CategoryInactiveException ex) {
+    return ResponseEntity.badRequest()
+        .body(CatalogApiErrorResponse.categoryInactive(ex.getMessage()));
   }
 
   @ExceptionHandler(IllegalArgumentException.class)

@@ -46,3 +46,9 @@ Funcionalidade: Cadastro de produto (Catalog W1 — incremento 1)
     Quando lista os produtos filtrados pela última categoria
     Então a resposta da listagem de produtos é 200
     E a listagem filtrada contém 1 item com nome "SóNesta"
+
+  Cenário: Produto não pode usar categoria inativa
+    Dado que o operador está autenticado como admin de plataforma
+    E que categoria inativa de apoio ao produto foi criada com nome "Inativa"
+    Quando cadastra um produto com nome "Bloqueado" e preço 7.00 vinculado à última categoria
+    Então a API de produtos responde 400 com código "CATEGORY_INACTIVE"

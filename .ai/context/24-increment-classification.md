@@ -19,7 +19,8 @@ Owner/purpose: Classificar incrementos para aplicar o conjunto mínimo certo de 
 | **TS** | Tenant-scoped feature | API ou domínio que lê/escreve dados **escopados a tenant** (JWT). |
 | **XA** | Cross-aggregate / referência validada | Altera vínculo ou validação entre agregados **no mesmo BC** (ex.: FK + `findByIdAndTenant`). |
 | **NT** | Non-tenant técnico | Mudança **sem** semântica multi-tenant (ex.: util compartilhado, config global explicitamente fora de tenant). |
-| **RF** | Refactor-only | Comportamento observável **inalterado**; só estrutura/nomes. |
+| **RF** | Query / Filtering / Listing | Mudança focada em consulta/listagem/filtros sem alterar regras centrais de autoria/autorização do domínio. |
+| **CR** | Code Refactor | Comportamento observável **inalterado**; só estrutura/nomes. |
 | **BF** | Bugfix | Corrige comportamento errado **sem** novo contrato; escopo mínimo. |
 | **DS** | Design system / UI | Tokens, componentes, acessibilidade; pode combinar com **TS** se a UI for tenant-aware. |
 | **DC** | Docs / governança | Apenas `.ai/`, ADRs, README de arquitetura — **sem** código de produção. |
@@ -42,10 +43,18 @@ Owner/purpose: Classificar incrementos para aplicar o conjunto mínimo certo de 
 - Checklist 20: marcar **N/A** com justificativa por linha não aplicável; ainda assim **23** completo.
 - Testes no nível adequado ao risco (não forçar BDD se não houver comportamento de negócio).
 
-### RF — Refactor-only
+### RF — Query / Filtering / Listing
 
-- Proibir mistura com mudança funcional no mesmo lote (21); testes existentes devem continuar a passar.
-- Checklist 20: **N/A** global salvo se tocar código que já era tenant-scoped (avaliar caso a caso).
+- Alterações devem ficar restritas a comportamento de leitura/consulta/listagem/filtro.
+- Testes devem cobrir: resultado esperado com filtro, lista vazia quando aplicável e não regressão da listagem base.
+- Se o fluxo for tenant-scoped, aplicar checklist 20 normalmente (não marcar N/A por padrão).
+
+### CR — Code Refactor
+
+- Comportamento observável deve permanecer inalterado.
+- Proibir mistura com mudança funcional no mesmo lote (21).
+- Testes existentes devem continuar a passar.
+- Checklist 20: **N/A** global salvo se tocar código tenant-scoped (avaliar caso a caso).
 
 ### BF — Bugfix
 

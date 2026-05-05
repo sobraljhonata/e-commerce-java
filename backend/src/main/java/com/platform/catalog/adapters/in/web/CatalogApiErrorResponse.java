@@ -29,5 +29,9 @@ public record CatalogApiErrorResponse(
     return new CatalogApiErrorResponse("CATEGORY_NOT_FOUND", message, List.of());
   }
 
+  public static CatalogApiErrorResponse categoryInactive(String message) {
+    return new CatalogApiErrorResponse("CATEGORY_INACTIVE", message, List.of());
+  }
+
   public record FieldViolation(String field, String message) {}
 }

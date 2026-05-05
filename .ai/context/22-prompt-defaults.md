@@ -1,6 +1,6 @@
 # Prompt defaults — Phase 4
 
-Version: 1.1  
+Version: 1.2  
 Last updated: 2026-05-04  
 Status: Active (normative for Phase 4 agents)  
 Owner/purpose: Reduzir repetição de instruções nos prompts humanos e estabelecer comportamento padrão dos agentes
@@ -18,9 +18,12 @@ Os agentes **devem assumir** automaticamente este documento e os contextos indic
 ## Fonte de verdade
 
 - **Decisões de plataforma e implementação** estão nos **ADRs e outputs** em `.ai/outputs/03-architecture/`, em particular o **ADR 16** (`.ai/outputs/03-architecture/16-platform-implementation-standards.md`).
-- **Normas operacionais** (testes multi-tenant, checklist de output, estilo, classificação de incrementos) estão nos **contextos** 19–24 em `.ai/context/`.
+- **Normas operacionais** (testes multi-tenant, checklist de output, estilo, classificação de incrementos, DoD, auto-check) estão nos **contextos** 19–26 em `.ai/context/`.
 - **Hierarquia em caso de ambiguidade:** ADR / output arquitetural **>** contexto normativo **>** instruções do agente **>** texto livre do prompt. O prompt **não** revoga ADR sem explícita mudança de documentação.
 - **Classificação do incremento** (tipo de trabalho): ver `.ai/context/24-increment-classification.md`; os agentes Phase 4 **inferem** o tipo e aplicam o perfil correspondente.
+- **Definition of Done**: ver `.ai/context/25-definition-of-done.md`; itens obrigatórios não atendidos impedem Done sem ressalvas.
+- **Self-check de agente**: ver `.ai/context/26-agent-self-check.md`; auto-correção antes de concluir.
+- **Decisões de domínio/produto acumuladas**: consultar `.ai/outputs/03-architecture/17-domain-decisions-log.md`.
 
 ## Fontes normativas (sempre aplicáveis na Phase 4)
 
@@ -32,12 +35,15 @@ Os agentes **devem assumir** automaticamente este documento e os contextos indic
 | Estilo, formatação, commits | `.ai/context/21-code-style-and-formatting-rules.md` |
 | Estrutura mínima de entrega | `.ai/context/23-output-template.md` |
 | Classificação de incrementos | `.ai/context/24-increment-classification.md` |
+| Definition of Done | `.ai/context/25-definition-of-done.md` |
+| Agent self-check | `.ai/context/26-agent-self-check.md` |
+| Domain decisions log | `.ai/outputs/03-architecture/17-domain-decisions-log.md` |
 
 ## Regra de manutenção
 
-- Alterar **padrões estáveis** de implementação (hexágono, multi-tenant, política 404, pirâmide de testes): atualizar primeiro o **ADR 16** (ou novo ADR em `outputs/03-architecture/`) e só depois ajustar **22/23/24** ou agentes para **remeter** ao novo texto — evitar drift entre ADR e contextos.
+- Alterar **padrões estáveis** de implementação (hexágono, multi-tenant, política 404, pirâmide de testes): atualizar primeiro o **ADR 16** (ou novo ADR em `outputs/03-architecture/`) e só depois ajustar **22/23/24/25/26** ou agentes para **remeter** ao novo texto — evitar drift entre ADR e contextos.
 - Alterar **só operacional** (ex.: exemplo de comando, redação do template de checklist sem mudar regra): editar o contexto afetado (19–21 ou 20) mantendo coerência com o ADR.
-- Novo **tipo de incremento** ou perfil de teste: atualizar **24** e, se necessário, uma linha no agente Phase 4 correspondente; não duplicar tabelas longas em agentes.
+- Novo **tipo de incremento** ou perfil de teste: atualizar **24** e, se necessário, **25**; não duplicar tabelas longas em agentes.
 - **00-project-context.md** deve manter a secção *Engineering governance bootstrap* alinhada quando entrar ou sair um documento do pacote normativo.
 - Qualquer mudança que **contradiga** um ADR existente exige **ADR novo ou revisão explícita** do ADR antigo; não “corrigir” só no prompt.
 

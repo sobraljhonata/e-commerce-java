@@ -1,3 +1,16 @@
+## Status: PARTIALLY SUPERSEDED
+
+Este documento contém premissas iniciais da plataforma.
+
+Algumas decisões foram atualizadas nos seguintes artefatos:
+- `16-platform-implementation-standards.md`
+- `17-domain-decisions-log.md`
+- contextos `19–26`
+
+Este documento deve ser lido como histórico + referência.
+
+---
+
 # MVP da plataforma
 
 **Definição:** primeiro incremento **greenfield** que prova **tenant real**, **compra segura** e **base de evolução** — alinhado à auditoria (paridade mínima de capacidades transacionais, sem copiar legado).  

@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.platform.catalog.domain.Category;
+import com.platform.catalog.domain.CategoryInactiveException;
 import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.Product;
 import com.platform.iam.application.AuthenticatedUser;
@@ -87,6 +88,21 @@ class CreateProductUseCaseTest {
 
     assertThrows(
         CategoryNotFoundException.class,
+        () -> useCase.execute("Notebook", new BigDecimal("1999.00"), true, CATEGORY_ID));
+    verify(productRepository, never()).save(any());
+  }
+
+  @Test
+  void with_inactive_category_throws() {
+    when(currentUserProvider.currentUser())
+        .thenReturn(
+            Optional.of(
+                new AuthenticatedUser(USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
+    when(categoryRepository.findByIdAndTenant(TENANT, CATEGORY_ID))
+        .thenReturn(Optional.of(Category.restore(CATEGORY_ID, TENANT, "Moda", false)));
+
+    assertThrows(
+        CategoryInactiveException.class,
         () -> useCase.execute("Notebook", new BigDecimal("1999.00"), true, CATEGORY_ID));
     verify(productRepository, never()).save(any());
   }

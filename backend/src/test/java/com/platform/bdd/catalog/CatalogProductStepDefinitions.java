@@ -279,6 +279,22 @@ public class CatalogProductStepDefinitions {
     lastCategoryId = json.get("id").asText();
   }
 
+  @E("que categoria inativa de apoio ao produto foi criada com nome {string}")
+  public void cadastraCategoriaInativaParaAssociacao(String nome) throws Exception {
+    var res =
+        mockMvc
+            .perform(
+                post("/api/admin/categories")
+                    .header("Authorization", "Bearer " + bearerToken)
+                    .contentType(APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(new CreateCategoryRequest(nome, false))))
+            .andReturn()
+            .getResponse();
+    assertEquals(201, res.getStatus());
+    JsonNode json = mapper.readTree(res.getContentAsString());
+    lastCategoryId = json.get("id").asText();
+  }
+
   @Quando("cadastra um produto com nome {string} e preço {double} vinculado à última categoria")
   public void cadastraProdutoVinculadoAUltimaCategoria(String nome, double preco) throws Exception {
     var res =
@@ -305,5 +321,12 @@ public class CatalogProductStepDefinitions {
   public void produtoRetornadoComCategoryIdDaUltimaCategoria() {
     assertNotNull(lastJson);
     assertEquals(lastCategoryId, lastJson.get("categoryId").asText());
+  }
+
+  @Então("a API de produtos responde {int} com código {string}")
+  public void respondeComStatusECodigo(int esperadoStatus, String esperadoCodigo) {
+    assertEquals(esperadoStatus, lastStatus);
+    assertNotNull(lastJson);
+    assertEquals(esperadoCodigo, lastJson.get("code").asText());
   }
 }

@@ -1,3 +1,16 @@
+## Status: PARTIALLY SUPERSEDED
+
+Este documento contém premissas iniciais da plataforma.
+
+Algumas decisões foram atualizadas nos seguintes artefatos:
+- `16-platform-implementation-standards.md`
+- `17-domain-decisions-log.md`
+- contextos `19–26`
+
+Este documento deve ser lido como histórico + referência.
+
+---
+
 # Blueprint detalhado — Wave 1
 
 **Duração orientativa:** 8–12 semanas para time pequeno-médio (ajustar ao velocity). **Meta:** entregar **MVP1** definido em `10-mvp-da-plataforma.md`.  

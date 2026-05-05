@@ -62,15 +62,18 @@ Entrypoint de governança para **engenharia assistida por IA** (Phase 4 e trabal
 | **22** | `.ai/context/22-prompt-defaults.md` | Defaults de prompt e ligação ao pacote acima. |
 | **23** | `.ai/context/23-output-template.md` | Estrutura mínima de entrega (9 secções). |
 | **24** | `.ai/context/24-increment-classification.md` | Classificação de incrementos e regras por tipo (agentes inferem o tipo). |
+| **25** | `.ai/context/25-definition-of-done.md` | Definition of Done geral e por tipo de incremento. |
+| **26** | `.ai/context/26-agent-self-check.md` | Auto-check obrigatório de agentes antes de concluir entregas/revisões. |
+| **17** | `.ai/outputs/03-architecture/17-domain-decisions-log.md` | Log de decisões de domínio/produto por bounded context. |
 
-*(O **16** é ADR em `outputs/`; **19–24** são contextos em `.ai/context/`.)*
+*(Os **16** e **17** ficam em `outputs/`; **19–26** são contextos em `.ai/context/`.)*
 
 ### Hierarquia de autoridade
 
 1. **ADR / outputs de arquitetura** (ex.: **16**, e documentos em `.ai/outputs/03-architecture/`) — decisões estáveis; prevalecem em conflito.
-2. **Contextos normativos** (19–24 e demais em `.ai/context/`) — operacionalizam ADRs e políticas de produto.
+2. **Contextos normativos** (19–26 e demais em `.ai/context/`) — operacionalizam ADRs e políticas de produto.
 3. **Agentes** (`.ai/agents/phase-4-guided-implementation/*.md`) — comportamento e checklist de execução no IDE; **não** redefinem ADR nem contradizem contextos.
 
 ### Regra para prompts
 
-**Não é necessário repetir** no prompt as regras já cobertas pelo pacote **16 + 19–24** e pelos agentes Phase 4, salvo exceção pontual (ex.: política experimental ainda não documentada). Basta indicar BC, tipo ou descrição do incremento e o resultado esperado; ver `.ai/context/22-prompt-defaults.md`.
+**Não é necessário repetir** no prompt as regras já cobertas pelo pacote **16/17 + 19–26** e pelos agentes Phase 4, salvo exceção pontual (ex.: política experimental ainda não documentada). Basta indicar BC, tipo ou descrição do incremento e o resultado esperado; ver `.ai/context/22-prompt-defaults.md`.

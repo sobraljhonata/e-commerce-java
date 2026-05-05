@@ -1,6 +1,6 @@
 # Output template — Phase 4
 
-Version: 1.1  
+Version: 1.2  
 Last updated: 2026-05-04  
 Status: Active (normative template)  
 Owner/purpose: Estrutura mínima obrigatória de entrega para implementação/revisão na Phase 4
@@ -20,6 +20,10 @@ Para incrementos **tenant-scoped**, a secção **8** é obrigatória com a tabel
 ## 1. Objetivo
 
 O que o incremento pretende entregar (1–3 frases objetivas) e o **tipo classificado** (códigos em `.ai/context/24-increment-classification.md`) com **uma frase** de justificativa da inferência.
+
+Também indicar, em 1–2 linhas:
+- **DoD status** (conforme `.ai/context/25-definition-of-done.md`): Done / Done com ressalvas / Not done.
+- **Pendências / riscos** obrigatórios ainda abertos (se houver).
 
 ## 2. Decisões arquiteturais
 

@@ -121,6 +121,39 @@ class ProductCategoryAssociationApiIntegrationTest {
   }
 
   @Test
+  @DisplayName("POST produto com categoryId de categoria inativa — 400 CATEGORY_INACTIVE")
+  void create_with_inactive_category_returns_400() throws Exception {
+    String token =
+        bearerToken(
+            InMemoryAdminUserRepository.SEED_EMAIL, InMemoryAdminUserRepository.SEED_PASSWORD);
+
+    String catBody =
+        mockMvc
+            .perform(
+                post("/api/admin/categories")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(new CreateCategoryRequest("Off", false))))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    UUID inactiveCategoryId = UUID.fromString(mapper.readTree(catBody).get("id").asText());
+
+    mockMvc
+        .perform(
+            post("/api/admin/products")
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content(
+                    mapper.writeValueAsString(
+                        new CreateProductRequest(
+                            "X", new java.math.BigDecimal("1.00"), true, inactiveCategoryId))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("CATEGORY_INACTIVE"));
+  }
+
+  @Test
   @DisplayName("POST produto com categoryId inexistente — 404 CATEGORY_NOT_FOUND")
   void create_with_unknown_category_returns_404() throws Exception {
     String token =
@@ -251,6 +284,55 @@ class ProductCategoryAssociationApiIntegrationTest {
                             "P2", new java.math.BigDecimal("11.00"), true, cat2))))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.categoryId").value(cat2.toString()));
+  }
+
+  @Test
+  @DisplayName("PATCH produto com categoryId inativa — 400 CATEGORY_INACTIVE")
+  void update_with_inactive_category_returns_400() throws Exception {
+    String token =
+        bearerToken(
+            InMemoryAdminUserRepository.SEED_EMAIL, InMemoryAdminUserRepository.SEED_PASSWORD);
+
+    String productBody =
+        mockMvc
+            .perform(
+                post("/api/admin/products")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(APPLICATION_JSON)
+                    .content(
+                        mapper.writeValueAsString(
+                            new CreateProductRequest(
+                                "P", new java.math.BigDecimal("10.00"), true, null))))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    String productId = mapper.readTree(productBody).get("id").asText();
+
+    String catBody =
+        mockMvc
+            .perform(
+                post("/api/admin/categories")
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(APPLICATION_JSON)
+                    .content(mapper.writeValueAsString(new CreateCategoryRequest("Off", false))))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getContentAsString();
+    UUID inactiveCategoryId = UUID.fromString(mapper.readTree(catBody).get("id").asText());
+
+    mockMvc
+        .perform(
+            patch("/api/admin/products/" + productId)
+                .header("Authorization", "Bearer " + token)
+                .contentType(APPLICATION_JSON)
+                .content(
+                    mapper.writeValueAsString(
+                        new UpdateProductRequest(
+                            "P2", new java.math.BigDecimal("11.00"), true, inactiveCategoryId))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("CATEGORY_INACTIVE"));
   }
 
   @Test

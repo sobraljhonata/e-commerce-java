@@ -16,6 +16,7 @@ import com.platform.catalog.application.CreateProductUseCase;
 import com.platform.catalog.application.GetProductByIdUseCase;
 import com.platform.catalog.application.ListProductsUseCase;
 import com.platform.catalog.application.UpdateProductUseCase;
+import com.platform.catalog.domain.CategoryInactiveException;
 import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.Product;
 import com.platform.catalog.domain.ProductNotFoundException;
@@ -104,6 +105,22 @@ class ProductControllerWebTest {
                         new CreateProductRequest("P", BigDecimal.ONE, true, CATEGORY_ID))))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("CATEGORY_NOT_FOUND"));
+  }
+
+  @Test
+  void post_returns_400_when_category_inactive() throws Exception {
+    when(createProductUseCase.execute(eq("P"), eq(BigDecimal.ONE), eq(true), eq(CATEGORY_ID)))
+        .thenThrow(new CategoryInactiveException(CATEGORY_ID));
+
+    mockMvc
+        .perform(
+            post("/api/admin/products")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        new CreateProductRequest("P", BigDecimal.ONE, true, CATEGORY_ID))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("CATEGORY_INACTIVE"));
   }
 
   @Test
@@ -241,6 +258,24 @@ class ProductControllerWebTest {
                         new UpdateProductRequest("X", BigDecimal.ONE, true, CATEGORY_ID))))
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("CATEGORY_NOT_FOUND"));
+  }
+
+  @Test
+  void patch_returns_400_when_category_inactive() throws Exception {
+    UUID id = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    when(updateProductUseCase.execute(
+            eq(id), eq("X"), eq(BigDecimal.ONE), eq(true), eq(CATEGORY_ID)))
+        .thenThrow(new CategoryInactiveException(CATEGORY_ID));
+
+    mockMvc
+        .perform(
+            patch("/api/admin/products/" + id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(
+                    objectMapper.writeValueAsString(
+                        new UpdateProductRequest("X", BigDecimal.ONE, true, CATEGORY_ID))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("CATEGORY_INACTIVE"));
   }
 
   @Test

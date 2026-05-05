@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.platform.catalog.domain.Category;
+import com.platform.catalog.domain.CategoryInactiveException;
 import com.platform.catalog.domain.CategoryNotFoundException;
 import com.platform.catalog.domain.Product;
 import com.platform.catalog.domain.ProductNotFoundException;
@@ -92,6 +93,23 @@ class UpdateProductUseCaseTest {
 
     assertThrows(
         CategoryNotFoundException.class,
+        () -> useCase.execute(productId, "New", new BigDecimal("9.99"), false, CAT));
+  }
+
+  @Test
+  void with_inactive_category_returns_category_inactive() {
+    UUID productId = UUID.fromString("550e8400-e29b-41d4-a716-446655440000");
+    Product existing = Product.restore(productId, TENANT, "Old", BigDecimal.ONE, true, null);
+    when(currentUserProvider.currentUser())
+        .thenReturn(
+            Optional.of(
+                new AuthenticatedUser(USER, TENANT, "op@test.dev", List.of("PLATFORM_ADMIN"))));
+    when(productRepository.findByIdAndTenant(TENANT, productId)).thenReturn(Optional.of(existing));
+    when(categoryRepository.findByIdAndTenant(TENANT, CAT))
+        .thenReturn(Optional.of(Category.restore(CAT, TENANT, "X", false)));
+
+    assertThrows(
+        CategoryInactiveException.class,
         () -> useCase.execute(productId, "New", new BigDecimal("9.99"), false, CAT));
   }
 

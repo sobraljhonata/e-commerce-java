@@ -1,3 +1,13 @@
+## Status: OUTDATED
+
+Este documento reflete o estado até o incremento correspondente ao momento do fechamento original.
+
+Para o estado atual, ver:
+- `catalog-w1-increment-ledger.md`
+- `00-wave-1-current-status.md`
+
+---
+
 # Fechamento técnico — BC Catalog (Wave 1 atual)
 
 **Escopo:** consolidar o estado implementado até agora no BC Catalog, mantendo rastreabilidade com Tenant W1.1 e IAM W1.2.  

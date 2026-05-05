@@ -1,3 +1,16 @@
+## Status: SUPERSEDED
+
+Este documento foi substituído por:
+- `.ai/outputs/03-architecture/16-platform-implementation-standards.md`
+- `.ai/context/19-multi-tenant-testing-rules.md`
+
+Motivo:
+A estratégia atual define que `tenantId` vem exclusivamente do contexto autenticado (JWT).
+
+Este documento deve ser considerado apenas histórico.
+
+---
+
 # Estratégia de multi-tenant
 
 **Objetivo:** isolamento forte, custo operacional controlado e caminho de evolução para clientes enterprise.  
